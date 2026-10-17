@@ -86,3 +86,5 @@ Every published claim carries:
 - `evidence_ids`: list of evidence IDs backing the claim
 - `claim_span`: pointer into the snapshot (JSON key, table cell, or short substring) proving where the value came from
 - `extraction_method`: short label for how the value was extracted (e.g. `official_registry`, `financial_mapping`, `module_fallback`, `nav:posting`)
+
+Requires `uv` or `pip`. The run command falls back to `pip install -r requirements.txt` when `uv` is not available.

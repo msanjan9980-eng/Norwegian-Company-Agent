@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Signalpost entry - one command to run.
 
+import shutil
 Usage:
     python run.py <organisations-file> [expected-count]
 
