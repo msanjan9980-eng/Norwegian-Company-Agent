@@ -112,7 +112,14 @@ def build_claims_and_evidence(
             "confidence": _confidence_for(block.get("source_class") or block.get("source_type") or ""),
             "evidence_ids": evidence_ids,
             "note": block_note,
+            "claim_span": f"module:{internal_key}",
         })
+
+    for c in claims:
+        if c.get("availability") == "available" and not c.get("claim_span"):
+            c["claim_span"] = f"field:{c.get('field')}"
+        if not c.get("extraction_method"):
+            c["extraction_method"] = "module_fallback"
 
     return claims, evidence
 
@@ -156,6 +163,7 @@ def build_nav_claims(
         "confidence": 0.95,
         "evidence_ids": [p["evidence_id"] for p in postings],
         "note": f"{len(postings)} ACTIVE job posting(s) on NAV Arbeidsplassen.",
+        "claim_span": "nav:has_active_postings",
     })
     for p in postings:
         claims.append({
@@ -178,6 +186,7 @@ def build_nav_claims(
             "confidence": 0.95,
             "evidence_ids": [p["evidence_id"]],
             "note": f"Active NAV posting: {p.get('title')}",
+            "claim_span": f"nav:posting:{p.get('id') or p.get('title')}",
         })
     return claims, evidence
 
@@ -249,6 +258,8 @@ def validate_citation_shape(envelope: dict) -> list[str]:
             problems.append(f"claims[{i}] bad availability")
         if c.get("availability") == "available" and not c.get("evidence_ids"):
             problems.append(f"claims[{i}] available but no evidence_ids")
+        if c.get("availability") == "available" and not c.get("claim_span"):
+            problems.append(f"claims[{i}] available but no claim_span")
         for eid in c.get("evidence_ids") or []:
             if eid not in id_set:
                 problems.append(f"claims[{i}] references missing evidence id {eid}")

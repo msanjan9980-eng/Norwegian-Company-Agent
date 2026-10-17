@@ -194,6 +194,22 @@ def generate_summary(envelope: dict) -> str:
         if url:
             lines.append(f"Official website: {url}")
 
+    # Hiring
+    hiring = _claim_value(envelope, "jobs.has_active_postings")
+    if hiring is True:
+        lines.append("Hiring: Active job postings found on NAV.")
+    elif hiring is False:
+        lines.append("Hiring: No active job postings found on NAV.")
+    else:
+        lines.append("Hiring: NAV was not checked or returned no data.")
+
+    # Public Activity
+    activities = _claims_with_prefix(envelope, "activity.") + _claims_with_prefix(envelope, "web.activity.")
+    if activities:
+        lines.append(f"Public activity: {len(activities)} dated event(s) found (e.g. role changes, registrations).")
+    else:
+        lines.append("Public activity: No dated public activity found in the checked sources.")
+
     unknowns = _stated_unknowns(envelope)
     if unknowns:
         lines.append("Unknown at this time: " + ", ".join(unknowns) + ".")

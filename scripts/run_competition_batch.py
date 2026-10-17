@@ -43,6 +43,7 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--expected-count", type=int, default=None,
                         help="Optional exact-count assertion. Derived from input if omitted.")
+    parser.add_argument("--timeout", type=int, default=0, help="Global wall-clock budget in seconds")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--checkpoint-every", type=int, default=25)
     parser.add_argument("--resume", action="store_true")

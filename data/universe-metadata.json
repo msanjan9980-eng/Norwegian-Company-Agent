@@ -790,5 +790,16 @@
   },
   "submission_extension_overlap": 0,
   "seed_profiles_reused": 367,
-  "seed_extension_profiles_reused": 91
+  "seed_extension_profiles_reused": 91,
+  "scoring_version": "2",
+  "official_batch_range": "1000-1100",
+  "official_archive_sha256": "1c89710e5b01f8617e86d09fbdff4a52f2f8dbbba297e74f7164b5984f5a0384",
+  "valid_output_states": [
+    "available",
+    "not_available",
+    "blocked",
+    "not_applicable",
+    "ambiguous",
+    "failed"
+  ]
 }

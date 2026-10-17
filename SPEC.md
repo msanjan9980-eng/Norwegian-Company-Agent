@@ -149,8 +149,12 @@ Top-level keys per envelope:
 ## Models, APIs, licences
 
 - **Models:** none in the default pipeline. Deterministic Python. An opt-in LLM synthesis step exists behind SIGNALPOST_LLM=1 and is not used for scoring.
+- **Registry snapshot:** optional `SIGNALPOST_REGISTRY_SNAPSHOT` (CSV or CSV.GZ) used for identity anchoring when supplied.
+
+- **Profile sections:** Overview, Financials, Leadership, Locations, Hiring, Activity, Changes.
+
 - **External APIs:** Brreg Enhetsregisteret and Regnskapsregisteret (public,
-  no key, no cost). NAV Arbeidsplassen is available but disabled by default
+  no key, no cost). NAV Arbeidsplassen is queried by default in the citation pass; pass `--skip-nav` to disable
   because its token endpoint is unreliable from some networks.
 - **Python dependencies:** see `pyproject.toml`. All MIT, BSD, Apache-2.0,
   or PSF-licensed.
@@ -223,3 +227,14 @@ file from disk or serve the repo root.
 - **Mobile** ? the index table collapses to cards below 700px. The
   compare bar reflows to full width. Tested at 375px.
 
+## Claim schema
+
+Every published claim carries:
+
+- `field`: dotted public field name
+- `value`: the reported value
+- `availability`: one of `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, `failed`
+- `confidence`: extraction confidence in [0, 1]
+- `evidence_ids`: list of evidence IDs backing the claim
+- `claim_span`: pointer into the snapshot (JSON key, table cell, or short substring) proving where the value came from
+- `extraction_method`: short label for how the value was extracted (e.g. `official_registry`, `financial_mapping`, `module_fallback`, `nav:posting`)

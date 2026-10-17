@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Deepen company-owned websites: extract contact, social, dated news, careers signals.
 
 Reads out/cited-envelopes.jsonl, fetches site pages for envelopes whose
@@ -158,6 +158,7 @@ def crawl_site(root_url: str) -> list[tuple[str, bytes, str, int | None, list[st
 
     # Fetch robots.txt first (safe_urlopen enforces SSRF policy on this fetch too)
     _robots = None
+    _robots_ok = True
     try:
         from urllib.robotparser import RobotFileParser
         _robots = RobotFileParser()
@@ -165,10 +166,19 @@ def crawl_site(root_url: str) -> list[tuple[str, bytes, str, int | None, list[st
         _robots.set_url(robots_url)
         try:
             _robots.read()
+        except urllib.error.HTTPError as e:
+            if e.code not in (404, 410):
+                _robots_ok = False
+            _robots = None
         except Exception:
             _robots = None
+            _robots_ok = False
     except Exception:
         _robots = None
+        _robots_ok = False
+
+    if not _robots_ok:
+        return []
 
     out: list[tuple[str, bytes, str, int | None, list[str]]] = []
     seen = set()

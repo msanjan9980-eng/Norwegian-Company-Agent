@@ -46,8 +46,10 @@ Top-level fields per envelope:
 ## Models, APIs, licences
 
 - **Models:** none in the default pipeline. Deterministic Python. An optional LLM synthesis step exists in scripts/llm_summary.py and is opt-in via SIGNALPOST_LLM=1 plus ANTHROPIC_API_KEY; it is off by default and is not required for scoring.
+- **Registry snapshot:** If `SIGNALPOST_REGISTRY_SNAPSHOT` is set to a Brreg CSV/CSV.GZ path, it is used for identity anchoring. Otherwise live Brreg is used.
+- **Profile sections:** Overview, Financials, Leadership, Locations, Hiring, Activity, Changes.
 - **External APIs:** Brreg Enhetsregisteret + Regnskapsregisteret (public,
-  no key required). NAV Arbeidsplassen (optional, opt-in via `--modules`).
+  no key required). NAV Arbeidsplassen (queried by default in the citation pass; pass `--skip-nav` to disable).
 - **Python dependencies:** see `pyproject.toml`. All MIT, BSD, Apache-2.0,
   or PSF-licensed. No commercial or restricted-licence dependencies.
 - **Expected cost per official run:** $0.00.
@@ -72,3 +74,15 @@ Total expected cost per official run (1,000-1,100 companies): **Under $5**. Run 
 - **Company websites:** Crawled only after the exact entity is verified via the registry name/org-number check. `robots.txt` is respected; no login-walled pages are accessed.
 - **Brave Search (optional):** Used only for candidate discovery. Requires `BRAVE_SEARCH_API_KEY` in the environment. If the key is absent, the connector is skipped; it never falls back to scraping search results as evidence.
 - **No secrets are hardcoded.** All API keys are read from environment variables only. Experimental LinkedIn files (run_linkedin_guest_experiment.py, run_linkedin_guest_jobs_connector.py, discover_linkedin_company_profiles.py) are present but not in the default pipeline and cannot back any published claim.
+
+## Claim schema
+
+Every published claim carries:
+
+- `field`: dotted public field name
+- `value`: the reported value
+- `availability`: one of `available`, `not_available`, `blocked`, `not_applicable`, `ambiguous`, `failed`
+- `confidence`: extraction confidence in [0, 1]
+- `evidence_ids`: list of evidence IDs backing the claim
+- `claim_span`: pointer into the snapshot (JSON key, table cell, or short substring) proving where the value came from
+- `extraction_method`: short label for how the value was extracted (e.g. `official_registry`, `financial_mapping`, `module_fallback`, `nav:posting`)

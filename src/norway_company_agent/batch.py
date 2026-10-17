@@ -11,15 +11,27 @@ from .sampling import iter_bulk
 
 
 TERMINAL_STATES = {
-    "complete",
+    "available",
+    "not_available",
+    "blocked",
     "not_applicable",
-    "not_found",
-    "blocked_policy",
-    "blocked_robots",
-    "source_error",
-    "budget_exhausted",
-    "submission_error",
+    "ambiguous",
+    "failed",
 }
+
+_INTERNAL_TO_OFFICIAL = {
+    "complete": "available",
+    "not_applicable": "not_applicable",
+    "not_found": "not_available",
+    "blocked_policy": "blocked",
+    "blocked_robots": "blocked",
+    "source_error": "failed",
+    "budget_exhausted": "failed",
+    "submission_error": "failed",
+}
+
+def _to_official_state(internal: str) -> str:
+    return _INTERNAL_TO_OFFICIAL.get(internal, "failed")
 
 
 def read_organisation_inputs(path: str | Path) -> list[dict[str, Any]]:
@@ -470,12 +482,14 @@ def terminal_envelope(
     module_states = {}
     for module in modules:
         record = profile.get("evidence", {}).get(module)
+        internal = evidence_terminal_state(record)
         module_states[module] = {
-            "state": evidence_terminal_state(record),
+            "state": _to_official_state(internal),
+            "internal_state": internal,
             "retry_count": int((record or {}).get("retry_count") or 0),
             "final_timestamp": (record or {}).get("retrieved_at") or completed_at,
         }
-    entity_state = "submission_error" if any(item["state"] == "submission_error" for item in module_states.values()) else "complete"
+    entity_state = "failed" if any(item["state"] == "failed" for item in module_states.values()) else "available"
 
     try:
         claims_list, evidence_list = _claims_evidence_from_profile(profile)

@@ -60,6 +60,7 @@ def main() -> int:
     count = derived
 
     env = os.environ.copy()
+    timeout_s = int(os.environ.get("SIGNALPOST_TIMEOUT_S", "0") or 0)
     env["PYTHONPATH"] = str(root / "src") + os.pathsep + env.get("PYTHONPATH", "")
     snapshot  = env.get("SIGNALPOST_REGISTRY_SNAPSHOT", "").strip()
     enable_llm = env.get("SIGNALPOST_LLM", "0").strip() == "1"
@@ -82,6 +83,7 @@ def main() -> int:
     if rc:
         return rc
 
+    snapshot = env.get("SIGNALPOST_REGISTRY_SNAPSHOT", "").strip()
     batch = [
         "uv", "run", "python", "-X", "utf8", "scripts/run_competition_batch.py",
         "--organisations", orgs,
@@ -92,8 +94,12 @@ def main() -> int:
         "--expected-count", str(count),
         "--workers", "32",
     ]
+    if timeout_s:
+        batch += ["--timeout", str(timeout_s)]
     if snapshot:
         batch += ["--bulk", snapshot]
+    if snapshot:
+        batch.extend(["--bulk", snapshot])
     if _run("[2/9] batch runner", batch, env):
         return 1
 
@@ -123,6 +129,7 @@ def main() -> int:
              "--workers", "16"], env):
         return 1
 
+    _run("[5.5/9] refresh merge", ["uv", "run", "python", "-X", "utf8", "scripts/merge_refresh_failures.py"], env)
     if _run("[6/9] enforce contract",
             ["uv", "run", "python", "-X", "utf8", "scripts/enforce_contract.py",
              "--input", "out/cited-envelopes.jsonl",
