@@ -49,6 +49,7 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--modules", default="registry,accounting_obligation,registry_live,financials,roles,group,locations,website")
     args = parser.parse_args()
+    started = time.monotonic()
 
     started_at = utc_now()
     organisation_inputs = read_organisation_inputs(args.organisations)
@@ -165,6 +166,9 @@ def main() -> None:
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = {pool.submit(enrich_safe, profile): profile["organisation_number"] for profile in pending_profiles}
         for index, future in enumerate(as_completed(futures), 1):
+            if args.timeout and (time.monotonic() - started) > args.timeout:
+                print(f"Timeout {args.timeout}s reached; stopping.", file=sys.stderr)
+                break
             org = futures[future]
             try:
                 profile, metric = future.result()
