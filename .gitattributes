@@ -1,0 +1,5 @@
+# Auto-detect text files, normalize LF in repo.
+* text=auto
+
+# Shell scripts must have LF, regardless of platform.
+*.sh text eol=lf

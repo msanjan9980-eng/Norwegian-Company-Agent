@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+
+# Generated output
+out/
+snapshots/
+index.html
+compare.html
+template.html
+company/
+data/summary.json
+
+# Large data files
+brreg-enheter.csv
+*.csv
+*.csv.gz
+data/universe.jsonl.gz
+signalpost-universe.jsonl.gz
+full-1000.jsonl
+entry-companies.jsonl
+smoke-companies.jsonl
+
+# Generated per-company JSON (keep metadata)
+data/*.json
+!data/universe-metadata.json
+
+# Backups and scratch scripts
+backup-*/
+project_dump*.txt
+fix_*.py
+patch_*.py
+append_*.py
+apply_merge.py
+generate_ui.py
+build.py
+finalize_viewer.py
+diag_pages.py
+peek_nav.py
+google-news-test.xml
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
