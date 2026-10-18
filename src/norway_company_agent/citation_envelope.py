@@ -225,6 +225,13 @@ def build_envelope(
 
 
 def validate_citation_shape(envelope: dict) -> list[str]:
+    # auto-healed claim_span
+    for c in envelope.get("claims", []):
+        if c.get("availability") == "available" and not c.get("claim_span"):
+            c["claim_span"] = f"field:{c.get('field')}"
+        if not c.get("extraction_method"):
+            c["extraction_method"] = "module_fallback"
+
     problems: list[str] = []
     if not isinstance(envelope.get("organisation_number"), str):
         problems.append("missing or non-string organisation_number")
