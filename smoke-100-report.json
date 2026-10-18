@@ -1,11 +1,11 @@
 {
-  "run_id": "official-20261017-212025",
-  "started_at": "2026-10-17T21:20:27.127346Z",
-  "completed_at": "2026-10-17T21:22:46.982081Z",
-  "expected_count": 100,
-  "emitted_envelopes": 100,
+  "run_id": "official-20261018-172955",
+  "started_at": "2026-10-18T17:29:57.502845Z",
+  "completed_at": "2026-10-18T17:54:26.324198Z",
+  "expected_count": 1100,
+  "emitted_envelopes": 1100,
   "resumed_profiles": 0,
-  "profiles_fetched_this_run": 100,
+  "profiles_fetched_this_run": 1100,
   "modules": [
     "registry",
     "accounting_obligation",
@@ -19,14 +19,14 @@
   "registry": {
     "bulk_used": false,
     "bulk_selected": 0,
-    "live_filled": 100,
+    "live_filled": 1100,
     "live_failed": 0
   },
   "operations": {
-    "requests": 432,
-    "bytes": 2560961,
-    "p50_ms": 1020,
-    "p95_ms": 1119
+    "requests": 4709,
+    "bytes": 34734106,
+    "p50_ms": 890,
+    "p95_ms": 3284
   },
   "validation": {
     "passed": true,
