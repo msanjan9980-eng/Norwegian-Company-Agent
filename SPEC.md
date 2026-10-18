@@ -238,3 +238,15 @@ Every published claim carries:
 - `evidence_ids`: list of evidence IDs backing the claim
 - `claim_span`: pointer into the snapshot (JSON key, table cell, or short substring) proving where the value came from
 - `extraction_method`: short label for how the value was extracted (e.g. `official_registry`, `financial_mapping`, `module_fallback`, `nav:posting`)
+
+## Installation & Usage
+
+**1. Install dependencies**
+Preferred (uses uv.lock for exact reproducibility):
+`uv sync`
+
+Fallback (if uv is not installed):
+`pip install -r requirements.txt`
+
+**2. Run the agent**
+`python run.py <organisations-file>`

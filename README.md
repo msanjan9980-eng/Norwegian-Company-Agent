@@ -88,3 +88,15 @@ Every published claim carries:
 - `extraction_method`: short label for how the value was extracted (e.g. `official_registry`, `financial_mapping`, `module_fallback`, `nav:posting`)
 
 Requires `uv` or `pip`. The run command falls back to `pip install -r requirements.txt` when `uv` is not available.
+
+## Installation & Usage
+
+**1. Install dependencies**
+Preferred (uses uv.lock for exact reproducibility):
+`uv sync`
+
+Fallback (if uv is not installed):
+`pip install -r requirements.txt`
+
+**2. Run the agent**
+`python run.py <organisations-file>`
