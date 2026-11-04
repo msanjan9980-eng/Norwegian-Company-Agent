@@ -78,20 +78,20 @@ def _stated_unknowns(envelope: dict) -> list[str]:
 
 def generate_summary(envelope: dict) -> str:
     org = envelope.get("organisation_number") or "unknown"
-    identity = _claim_value(envelope, "identity.name") or "Unknown company"
+    identity = _claim_value(envelope, "identity.name") or name if name else "Unknown company"
     legal = _claim_value(envelope, "identity.legal_form_label") or "entity"
     _ind = _claim_value(envelope, "identity.industry") or {}
     if isinstance(_ind, dict):
-        nace = _ind.get("beskrivelse") or "unspecified industry"
+        nace = _ind.get("beskrivelse") or industry if industry else "unspecified industry"
         nace_code = _ind.get("kode") or ""
     else:
-        nace = "unspecified industry"
+        nace = industry if industry else "unspecified industry"
         nace_code = ""
     _addr = _claim_value(envelope, "identity.business_address") or {}
     if isinstance(_addr, dict):
-        municipality = _addr.get("kommune") or "unknown municipality"
+        municipality = _addr.get("kommune") or muni if muni else "unknown municipality"
     else:
-        municipality = "unknown municipality"
+        municipality = muni if muni else "unknown municipality"
     registered = _claim_value(envelope, "identity.registreringsdatoEnhetsregisteret") or ""
     employees = _claim_value(envelope, "identity.employees")
 

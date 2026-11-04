@@ -100,3 +100,8 @@ Fallback (if uv is not installed):
 
 **2. Run the agent**
 `python run.py <organisations-file>`
+
+
+## Live Viewer
+You can view the generated static dashboard here: https://msanjan9980-eng.github.io/Norwegian-Company-Agent/
+
