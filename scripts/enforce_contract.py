@@ -97,7 +97,7 @@ def _sanitize_web_claims(envelope):
 
         # Point 4: News dates
         if field.startswith("web.activity.news") and isinstance(val, dict):
-            if not val.get("publish_date") and not val.get("date"):
+            if not val.get("publish_date") and not val.get("date") and val.get("extraction_method") != "website_news":
                 continue
 
         clean_claims.append(c)

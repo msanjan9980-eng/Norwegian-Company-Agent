@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """Deepen company-owned websites: extract contact, social, dated news, careers signals.
 
@@ -7,6 +8,87 @@ emits per-item claims. Every extraction requires the company's exact name
 or orgnr to appear on the fetched page.
 """
 from __future__ import annotations
+
+
+def _extract_jobs_and_news(html: str, base_url: str, evidence_id: str) -> list[dict]:
+    import re
+    from urllib.parse import urljoin
+    claims = []
+    anchors = re.findall(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
+
+    has_jobs = False
+    for href, title in anchors:
+        href_lower = href.lower()
+        title_clean = re.sub(r'<[^>]+>', '', title).strip()
+        if not title_clean or len(title_clean) < 3:
+            continue
+
+        if any(k in href_lower for k in ["karriere", "jobb", "stilling", "career"]):
+            has_jobs = True
+            claims.append({
+                "field": "jobs.posting",
+                "value": {"title": title_clean, "link": urljoin(base_url, href)},
+                "availability": "available",
+                "confidence": 0.90,
+                "evidence_ids": [evidence_id],
+                "note": "Job posting found on company website.",
+                "claim_span": f"website:job:{title_clean}",
+                "extraction_method": "website_careers"
+            })
+
+        elif any(k in href_lower for k in ["nyhet", "aktuelt", "news", "blog"]):
+            if title_clean.lower() in ["nyheter", "news", "aktuelt", "blog"]:
+                continue
+            claims.append({
+                "field": "web.activity.news",
+                "value": {"title": title_clean, "url": urljoin(base_url, href), "date": None},
+                "availability": "available",
+                "confidence": 0.90,
+                "evidence_ids": [evidence_id],
+                "note": "News article found on company website.",
+                "claim_span": f"website:news:{title_clean}",
+                "extraction_method": "website_news"
+            })
+
+    if has_jobs:
+        claims.append({
+            "field": "jobs.has_active_postings",
+            "value": True,
+            "availability": "available",
+            "confidence": 0.90,
+            "evidence_ids": [evidence_id],
+            "note": "Active job postings found on company website.",
+            "claim_span": "website:has_active_postings",
+            "extraction_method": "website_careers"
+        })
+    if 'html' in locals() and 'base_url' in locals() and 'evidence_id' in locals():
+        claims.extend(_extract_jobs_and_news(html, base_url, evidence_id))
+    # If no jobs found via links, forcefully try common career paths
+    if not has_jobs:
+        import urllib.request
+        for path in ["/karriere", "/jobb", "/careers", "/stillinger"]:
+            try:
+                test_url = base_url.rstrip("/") + path
+                req = urllib.request.Request(test_url, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=5) as resp:
+                    if resp.status == 200:
+                        claims.append({
+                            "field": "jobs.has_active_postings",
+                            "value": True,
+                            "availability": "available",
+                            "confidence": 0.85,
+                            "evidence_ids": [evidence_id],
+                            "note": f"Found active careers page at {test_url}",
+                            "claim_span": f"url:{path}",
+                            "extraction_method": "website_careers_direct"
+                        })
+                        has_jobs = True
+                        break
+            except Exception:
+                pass
+
+    return claims
+
 
 import argparse
 import json
