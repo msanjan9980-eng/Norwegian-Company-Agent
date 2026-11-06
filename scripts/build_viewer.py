@@ -385,7 +385,7 @@ HTML = r"""<!DOCTYPE html>
                 '<div class="bento-card"><div class="bento-label">Group Entities</div><div class="bento-value">' + grpCount + '</div><div class="bento-sub">Children</div></div>' +
                 '</div>' +
 
-                '<div class="tabs"><div class="tab active" onclick="switchTab(event, \'ov\')">Overview</div><div class="tab" onclick="switchTab(event, \'fi\')">Financials</div><div class="tab" onclick="switchTab(event, \'pe\')">Leadership</div><div class="tab" onclick="switchTab(event, \'lo\')">Locations</div><div class="tab" onclick="switchTab(event, \'ch\')">Changes</div><div class="tab" onclick="switchTab(event, \'hi\')">Hiring</div><div class="tab" onclick="switchTab(event, \'ac\')">Activity</div></div>' +
+                '<div class="tabs"><div class="tab active" onclick="switchTab(event, \'ov\')">Overview</div><div class="tab" onclick="switchTab(event, \'fi\')">Financials</div><div class="tab" onclick="switchTab(event, \'pe\')">Leadership</div><div class="tab" onclick="switchTab(event, \'lo\')">Locations</div><div class="tab" onclick="switchTab(event, \'ch\')">Changes</div><div class="tab" onclick="switchTab(event, \'hi\')">Hiring</div><div class="tab" onclick="switchTab(event, \'ac\')">Activity</div><div class="tab" onclick="switchTab(event, \'ev\')">Evidence</div></div>' +
                 
                 '<div id="tc-ov" class="tab-content active"><h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:12px">Overview</h3><p style="color:var(--text-muted);line-height:1.7;max-width:800px;white-space:pre-wrap">' + esc(d.summary || 'No summary available.') + '</p></div>' +
                 '<div id="tc-fi" class="tab-content">' + (chartHtml || '<p style="padding:20px;color:var(--text-muted);text-align:center">No historical chart data available.</p>') + '<table><thead><tr><th>Metric</th><th>Year</th><th>Value</th></tr></thead><tbody>' + (finRows || '<tr><td colspan="3" style="color:var(--text-muted)">No financial data.</td></tr>') + '</tbody></table></div>' +
@@ -396,7 +396,9 @@ HTML = r"""<!DOCTYPE html>
                 '<div id="tc-hi" class="tab-content"><h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:12px">Hiring</h3>' + 
                 (jobRows || '<p style="color:var(--text-muted)">No active postings found in the checked sources.</p>') + '</div>' +
                 '<div id="tc-ac" class="tab-content"><h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:12px">Public Activity</h3><table><thead><tr><th>Event</th><th>Date</th><th>Details</th></tr></thead><tbody>' + 
-                (actRows || '<tr><td colspan="3" style="color:var(--text-muted)">No dated public activity found in the checked sources.</td></tr>') + '</tbody></table></div>';
+                (actRows || '<tr><td colspan="3" style="color:var(--text-muted)">No dated public activity found in the checked sources.</td></tr>') + '</tbody></table></div>' +
+                '<div id="tc-ev" class="tab-content"><h3 style="font-family:var(--font-serif);font-size:20px;margin-bottom:12px">Evidence Sources</h3><table><thead><tr><th>Source ID</th><th>URL</th><th>Retrieved At</th></tr></thead><tbody>' + 
+                (d.evidence && d.evidence.length ? d.evidence.map(e => '<tr><td style="font-family:monospace;font-size:12px">' + esc(e.id) + '</td><td><a href="' + esc(e.source_url) + '" target="_blank" style="color:var(--accent);text-decoration:underline;">' + esc(e.source_url) + '</a></td><td style="color:var(--text-muted);font-size:12px">' + esc(e.retrieved_at) + '</td></tr>').join('') : '<tr><td colspan="3" style="color:var(--text-muted)">No evidence snapshots found.</td></tr>') + '</tbody></table></div>';
         }
 
         function renderRight(d) {
@@ -513,6 +515,7 @@ def _row(env):
             {"field": _safe(c.get("field")), "value": c.get("value"), "availability": _safe(c.get("availability"))}
             for c in claims
         ],
+        "evidence": env.get("evidence") or [],
     }
 
 def main():
